@@ -58,7 +58,7 @@ def get_unique_color() -> str:
     return c
 
 
-def get_networks(client: docker.DockerClient, verbose: bool) -> typing.Dict[str, Network]:
+def get_networks(client: docker.DockerClient, verbose: bool, network: str = None) -> typing.Dict[str, Network]:
     networks: typing.Dict[str, Network] = {}
 
     for net in sorted(client.networks.list(), key=lambda k: k.name):
@@ -87,7 +87,8 @@ def get_networks(client: docker.DockerClient, verbose: bool) -> typing.Dict[str,
 
         color = get_unique_color()
         networks[net.name] = Network(net.name, gateway, internal, isolated, color)
-
+        if network:
+            return networks
     networks["host"] = Network("host", "0.0.0.0", False, False, "#808080")
 
     return networks
@@ -167,10 +168,10 @@ def draw_link(g: Graph, networks: typing.Dict[str, Network], link: Link):
            )
 
 
-def generate_graph(verbose: bool, file: str):
+def generate_graph(verbose: bool, file: str, network: str = None):
     docker_client = docker.from_env()
-
-    networks = get_networks(docker_client, verbose)
+    
+    networks = get_networks(docker_client, verbose, network)
     containers, links = get_containers(docker_client, verbose)
 
     if file:
@@ -206,6 +207,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize docker networks.")
     parser.add_argument("-v", "--verbose", help="Verbose output", action="store_true")
     parser.add_argument("-o", "--out", help="Write output to file", type=graphviz_output_file)
+    parser.add_argument("-n", "--network", help="Network name to visualize")
     args = parser.parse_args()
 
-    generate_graph(args.verbose, args.out)
+    generate_graph(args.verbose, args.out, args.network)
