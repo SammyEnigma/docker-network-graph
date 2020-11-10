@@ -96,7 +96,7 @@ def get_networks(client: docker.DockerClient, verbose: bool, network: str = None
     return networks
 
 
-def get_containers(client: docker.DockerClient, verbose: bool) -> (typing.List[Container], typing.List[Link]):
+def get_containers(client: docker.DockerClient, verbose: bool, network: str = None) -> (typing.List[Container], typing.List[Link]):
     containers: typing.List[Container] = []
     links: typing.List[Link] = []
 
@@ -184,7 +184,7 @@ def generate_graph(verbose: bool, file: str, network: str = None):
     docker_client = docker.from_env()
     
     networks = get_networks(docker_client, verbose, network)
-    containers, links = get_containers(docker_client, verbose)
+    containers, links = get_containers(docker_client, verbose, network)
 
     if file:
         base, ext = os.path.splitext(file)
