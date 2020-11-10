@@ -162,10 +162,14 @@ def draw_container(g: Graph, c: Container):
 
 
 def draw_link(g: Graph, networks: typing.Dict[str, Network], link: Link):
-    g.edge(f"container_{link.container_id}:{link.endpoint_id}",
+    try:
+        g.edge(f"container_{link.container_id}:{link.endpoint_id}",
            f"network_{link.network_name}",
            color=networks[link.network_name].color
            )
+    except KeyError:
+        # FIX: need to fix this later (problem comes from links)
+        pass
 
 
 def generate_graph(verbose: bool, file: str, network: str = None):
