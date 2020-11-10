@@ -60,8 +60,10 @@ def get_unique_color() -> str:
 
 def get_networks(client: docker.DockerClient, verbose: bool, network: str = None) -> typing.Dict[str, Network]:
     networks: typing.Dict[str, Network] = {}
-
-    for net in sorted(client.networks.list(), key=lambda k: k.name):
+    network_list = client.networks.list()
+    if network:
+        network_list = filter(lambda x: x.name == network, network_list)
+    for net in sorted(network_list, key=lambda k: k.name):
         try:
             gateway = net.attrs["IPAM"]["Config"][0]["Subnet"]
         except (KeyError, IndexError):
