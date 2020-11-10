@@ -120,7 +120,13 @@ def get_containers(client: docker.DockerClient, verbose: bool) -> (typing.List[C
         if verbose:
             print(f"Container: {container.name} {''.join([iface.address for iface in interfaces])}")
 
-        containers.append(Container(container.id, container.name, interfaces))
+        if network:
+            for net_name, net_info in container.attrs["NetworkSettings"]["Networks"].items():
+                if net_name == network:
+                    containers.append(Container(container.id, container.name, interfaces))
+                    break
+        else:
+            containers.append(Container(container.id, container.name, interfaces))
 
     return containers, links
 
@@ -155,8 +161,7 @@ def draw_container(g: Graph, c: Container):
 
     label = f"{{ {c.name} | {{ {' | '.join(iface_labels)} }} }}"
 
-    if c.interfaces:
-        g.node(f"container_{c.container_id}",
+    g.node(f"container_{c.container_id}",
            shape="record",
            label=label,
            fillcolor="#ff9999",
