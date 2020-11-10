@@ -155,7 +155,8 @@ def draw_container(g: Graph, c: Container):
 
     label = f"{{ {c.name} | {{ {' | '.join(iface_labels)} }} }}"
 
-    g.node(f"container_{c.container_id}",
+    if c.interfaces:
+        g.node(f"container_{c.container_id}",
            shape="record",
            label=label,
            fillcolor="#ff9999",
